@@ -146,5 +146,38 @@ void Deposit(){
     }
 }
 void Withdraw(){
+    struct Account acc;
+    int acc_no, acc_passwd;
+    printf("Enter your account number:");
+    scanf("%d",&acc_no);
+    printf("Enter your account password:");
+    scanf("%d",&acc_passwd);
+    
+    FILE *fptr;
+    fptr=fopen("bms.dat","r+b");
+    if (!fptr){
+        printf("Error! File Not Found\n");
+        return;
+    }
+    float withdraw_amount;
+    while(fread(&acc ,sizeof(struct Account),1,fptr)){
+        if (acc.acc_no == acc_no && acc.passwd ==acc_passwd){
+            printf("Enter Amount for Deposit:");
+            scanf("%f",&withdraw_amount);
+            if (withdraw_amount <=0){
+                printf("Invalid !!!");
+                return;
+            }
+            else{
+                acc.balance-=withdraw_amount;
+                printf("Sucessfully withdrew %f from your account!",&withdraw_amount);
+                printf("New Balance Amount: %f",acc.balance);
+            }
 
+            long pos = ftell(fptr)- sizeof(struct Account);
+            fseek(fptr,pos,SEEK_SET);
+            fwrite(&acc,sizeof(struct Account),1,fptr);
+            fclose(fptr);
+        }
+    }
 }
